@@ -1,0 +1,120 @@
+<mat-toolbar color="primary">
+  <span>Campaigns</span>
+</mat-toolbar>
+
+
+<div class="component" [@fadeIn]>
+  <div class="flip-card">
+    <div class="flip-card-inner" [style.transform]="isFlipped ? 'rotateY(180deg)' : ''">
+        <div class="flip-card-front">
+          <div class="grid-container">
+            <div class="actions-container">
+
+              <div class="inserts-container">
+                <form [formGroup]="filterForm">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Search..</mat-label>
+                    <input matInput (keyup)="applyFilter()" placeholder="Ex. Mia" #input formControlName="filterName">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>From</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="fromDate" (dateChange)="updateFromDateFilter()">
+                    <mat-hint>MM/DD/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>To</mat-label>
+                    <input matInput [matDatepicker]="pickerTo" formControlName="toDate" (dateChange)="updateFromDateFilter()">
+                    <mat-hint>MM/DD/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerTo></mat-datepicker>
+                  </mat-form-field>
+
+                  <button mat-flat-button color="accent" [disabled]="!filtersApplied" (click)="clearFilters()">
+                    <mat-icon>cancel</mat-icon>Clear
+                  </button>
+                </form>
+              </div>
+              <mat-slide-toggle [(ngModel)]="isFlipped" [checked]="isFlipped">Chart</mat-slide-toggle>
+            </div>
+
+            <div class="table-container">
+              <mat-table [dataSource]="dataSource" matSort>
+
+                <ng-container matColumnDef="status">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
+                  <mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="isDateInRange(row.startDate, row.endDate); else notInRange">
+                      <mat-icon style="color: green">check_circle</mat-icon>
+                    </ng-container>
+                    <ng-template #notInRange>
+                      <mat-icon style="color: red">cancel</mat-icon>
+                    </ng-template>
+                  </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+                  <mat-cell *matCellDef="let row"> {{row.name}} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="budget">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Budget </mat-header-cell>
+                  <mat-cell *matCellDef="let row"> $ {{row.budget}} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="startDate">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Start Date </mat-header-cell>
+                  <mat-cell *matCellDef="let row"> {{row.startDate}} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="endDate">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> End Date </mat-header-cell>
+                  <mat-cell *matCellDef="let row"> {{row.endDate}} </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+                <tr class="mat-row" *matNoDataRow>
+                  <mat-cell class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</mat-cell>
+                </tr>
+              </mat-table>
+
+              <mat-paginator [pageSizeOptions]="[10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+            </div>
+          </div>
+
+        </div>
+        <div class="flip-card-back">
+
+          <div class="grid-container">
+            <div class="actions-container">
+
+              <div class="inserts-container">
+                <!-- Here one can implement more functionality for the user to control the chart -->
+              </div>
+              <mat-slide-toggle [(ngModel)]="isFlipped" [checked]="isFlipped">Chart</mat-slide-toggle>
+            </div>
+
+            <div class="chart-container">
+              <ngx-charts-pie-chart
+              [view]="view"
+              [results]="results"
+              [gradient]="gradient"
+              [legend]="showLegend"
+              [labels]="showLabels"
+              [doughnut]="isDoughnut"
+                >
+              </ngx-charts-pie-chart>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
